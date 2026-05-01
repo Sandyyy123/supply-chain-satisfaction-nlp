@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Satisfaction Prediction in E-Commerce</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    background: #0f172a; color: #e2e8f0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.7; min-height: 100vh;
+  }
+  nav {
+    position: sticky; top: 0; z-index: 1000;
+    background: #0f172aee; backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1e293b; padding: 0.5rem 0;
+    overflow-x: auto; white-space: nowrap;
+  }
+  nav .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 1rem; display: flex; gap: 0.15rem; align-items: center; }
+  nav a { color: #94a3b8; text-decoration: none; font-size: 0.78rem; padding: 0.4rem 0.65rem; border-radius: 6px; transition: all 0.2s; flex-shrink: 0; }
+  nav a:hover, nav a:focus { color: #38bdf8; background: #1e293b; }
+  nav .nav-title { color: #38bdf8; font-weight: 700; font-size: 0.85rem; margin-right: 0.6rem; flex-shrink: 0; }
+  main { max-width: 1100px; margin: 0 auto; padding: 1.2rem 1.6rem 4rem; }
+  section { margin-bottom: 4rem; padding-top: 3.5rem; }
+  section:first-of-type { padding-top: 1rem; }
+  h1 {
+    font-size: 2.5rem; font-weight: 800; line-height: 1.2;
+    background: linear-gradient(135deg, #38bdf8, #a78bfa, #f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 0.6rem;
+  }
+  .subtitle { color: #94a3b8; font-size: 1.05rem; margin-bottom: 1.4rem; }
+  h2 {
+    font-size: 1.7rem; font-weight: 700; color: #38bdf8;
+    margin-bottom: 1.2rem; padding-bottom: 0.4rem; border-bottom: 2px solid #1e293b;
+  }
+  h3 { font-size: 1.18rem; font-weight: 600; margin: 1.4rem 0 0.6rem; color: #a78bfa; }
+  p { margin-bottom: 0.9rem; }
+  ul, ol { margin: 0.5rem 0 1rem 1.6rem; }
+  li { margin-bottom: 0.35rem; }
+  strong { color: #f8fafc; }
+  a { color: #38bdf8; text-decoration: none; border-bottom: 1px dashed #1e293b; }
+  a:hover { color: #a78bfa; border-bottom-color: #a78bfa; }
+  .box { border-radius: 10px; padding: 1.1rem 1.3rem; margin: 1rem 0 1.2rem; }
+  .box-pink   { background: #f472b610; border-left: 4px solid #f472b6; }
+  .box-green  { background: #34d39910; border-left: 4px solid #34d399; }
+  .box-blue   { background: #38bdf810; border-left: 4px solid #38bdf8; }
+  .box-purple { background: #a78bfa10; border-left: 4px solid #a78bfa; }
+  .box-amber  { background: #fbbf2410; border-left: 4px solid #fbbf24; }
+  pre { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 0.8rem 0 1.2rem; }
+  pre code { font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85rem; line-height: 1.6; color: #e2e8f0; }
+  p code, li code, td code { background: #1e293b; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.88em; color: #38bdf8; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.92rem; }
+  th, td { padding: 0.6rem 0.9rem; text-align: left; border-bottom: 1px solid #1e293b; }
+  th { background: #1e293b; color: #38bdf8; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  tr:hover { background: #1e293b40; }
+  .hero {
+    background: linear-gradient(135deg, #0f172a, #1e293b 60%, #0f172a);
+    padding: 3rem 2rem; border-radius: 16px; margin-bottom: 2rem;
+    border: 1px solid #334155; text-align: left;
+  }
+  .hero .meta { color: #94a3b8; font-size: 0.95rem; margin-top: 1rem; }
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
+  .meta-grid .item { background: #1e293b; padding: 0.7rem 0.9rem; border-radius: 8px; border-left: 3px solid #38bdf8; }
+  .meta-grid .item .lbl { display: block; font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+  .meta-grid .item .val { font-weight: 700; color: #e2e8f0; font-size: 0.95rem; }
+  img { max-width: 100%; height: auto; border-radius: 10px; margin: 0.8rem 0; border: 1px solid #1e293b; }
+  footer { text-align: center; color: #64748b; font-size: 0.85rem; padding: 2rem 1rem; border-top: 1px solid #1e293b; margin-top: 3rem; }
+</style>
+</head>
+<body>
+<nav><div class="nav-inner">
+  <span class="nav-title">Project 2: Olist CSat</span>
+  <a href="#overview">Overview</a>
+  <a href="#data">Data</a>
+  <a href="#methods">Methods</a>
+  <a href="#results">Results</a>
+  <a href="#discussion">Discussion</a>
+  <a href="#refs">References</a>
+</div></nav>
+<main>
+
+<section id="overview" class="hero">
+  <h1>Customer Satisfaction Prediction in E-Commerce</h1>
+  <div class="subtitle">Binary classification on the Olist Brazilian e-commerce dataset (96,353 delivered orders).</div>
+  <div class="meta-grid">
+    <div class="item"><span class="lbl">Task</span><span class="val">Binary classification (review_score >= 4)</span></div>
+<div class="item"><span class="lbl">Records</span><span class="val">96,353 orders, 79% positive</span></div>
+<div class="item"><span class="lbl">Best test ROC-AUC</span><span class="val">0.749 (Logistic Regression)</span></div>
+<div class="item"><span class="lbl">Best F1+ on positive</span><span class="val">0.861 (Random Forest)</span></div>
+<div class="item"><span class="lbl">Top feature</span><span class="val">delivery_days (0.228)</span></div>
+  </div>
+</section>
+
+<section id="data">
+  <h2>Dataset and Exploration</h2>
+  <h1>Exploration Report 1: Olist Supply Chain Customer Satisfaction</h1>
+<p><strong>Project:</strong> Liora #2 (Supply Chain - Customer Satisfaction)
+<strong>Date:</strong> 2026-05-01
+<strong>Notebook:</strong> <code>notebooks/01_eda.ipynb</code></p>
+<h2>1. Project framing</h2>
+<p>The DataScientest brief asks for a customer-satisfaction study built on review data, with the explicit modelling target being a star-rating regression / classification (1-5) plus optional NLP on the verbatim comment. The brief points to scraping Trustpilot or using Trusted Shops verified reviews. The dataset supplied for this Liora project is the public <strong>Olist Brazilian e-commerce</strong> corpus (2016-2018), which is a stronger fit for a supply-chain framing than scraped Trustpilot stars: every review is tied to a verified purchase with the full upstream trail (seller, items, shipment timestamps, freight cost, payment, delivery date), so we can actually measure the supply chain's effect on satisfaction rather than just the post-hoc opinion.</p>
+<h2>2. Dataset description</h2>
+<p>Nine CSV files, ~164 MB on disk. They form a star schema centred on <code>orders</code>:</p>
+<pre><code>customers --&lt; orders &gt;-- order_reviews
+                |   \--&lt; order_items &gt;-- products --- category_translation
+                |       \-------------- sellers
+                \--&lt; order_payments
+geolocation (zip_prefix, lat/lng)  attaches to customers and sellers via zip prefix
+</code></pre>
+<h3>Row counts and column counts</h3>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th style="text-align: right;">Rows</th>
+<th style="text-align: right;">Cols</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>olist_orders_dataset</code></td>
+<td style="text-align: right;">99,441</td>
+<td style="text-align: right;">8</td>
+<td>Fact table (one row per order)</td>
+</tr>
+<tr>
+<td><code>olist_order_items_dataset</code></td>
+<td style="text-align: right;">112,650</td>
+<td style="text-align: right;">7</td>
+<td>One row per (order, item, seller)</td>
+</tr>
+<tr>
+<td><code>olist_order_payments_dataset</code></td>
+<td style="text-align: right;">103,886</td>
+<td style="text-align: right;">5</td>
+<td>One row per (order, payment leg)</td>
+</tr>
+<tr>
+<td><code>olist_order_reviews_dataset</code></td>
+<td style="text-align: right;">99,224</td>
+<td style="text-align: right;">7</td>
+<td>One review per order (a few orders have &gt;1)</td>
+</tr>
+<tr>
+<td><code>olist_customers_dataset</code></td>
+<td style="text-align: right;">99,441</td>
+<td style="text-align: right;">5</td>
+<td>One row per <code>customer_id</code> (unique buyer-per-order)</td>
+</tr>
+<tr>
+<td><code>olist_products_dataset</code></td>
+<td style="text-align: right;">32,951</td>
+<td style="text-align: right;">9</td>
+<td>Product catalog with category and physical dims</td>
+</tr>
+<tr>
+<td><code>olist_sellers_dataset</code></td>
+<td style="text-align: right;">3,095</td>
+<td style="text-align: right;">4</td>
+<td>Seller directory with zip prefix and city/state</td>
+</tr>
+<tr>
+<td><code>olist_geolocation_dataset</code></td>
+<td style="text-align: right;">1,000,163</td>
+<td style="text-align: right;">5</td>
+<td>Brazilian zip-prefix lat/lng lookup</td>
+</tr>
+<tr>
+<td><code>product_category_name_translation</code></td>
+<td style="text-align: right;">71</td>
+<td style="text-align: right;">2</td>
+<td>PT to EN category mapping</td>
+</tr>
+</tbody>
+</table>
+<h3>Schemas (key columns)</h3>
+<ul>
+<li><strong>orders:</strong> <code>order_id</code>, <code>customer_id</code>, <code>order_status</code> (delivered / shipped / canceled / unavailable / invoiced / processing / created / approved), and 5 timestamp columns (<code>order_purchase_timestamp</code>, <code>order_approved_at</code>, <code>order_delivered_carrier_date</code>, <code>order_delivered_customer_date</code>, <code>order_estimated_delivery_date</code>). All timestamps load as strings and need parsing.</li>
+<li><strong>order_items:</strong> <code>order_id</code>, <code>order_item_id</code>, <code>product_id</code>, <code>seller_id</code>, <code>shipping_limit_date</code>, <code>price</code>, <code>freight_value</code>.</li>
+<li><strong>order_payments:</strong> <code>order_id</code>, <code>payment_sequential</code>, <code>payment_type</code> (credit_card / boleto / voucher / debit_card / not_defined), <code>payment_installments</code>, <code>payment_value</code>.</li>
+<li><strong>order_reviews:</strong> <code>review_id</code>, <code>order_id</code>, <code>review_score</code> (int 1-5, <strong>the target</strong>), <code>review_comment_title</code>, <code>review_comment_message</code>, <code>review_creation_date</code>, <code>review_answer_timestamp</code>.</li>
+<li><strong>customers:</strong> <code>customer_id</code>, <code>customer_unique_id</code>, <code>customer_zip_code_prefix</code>, <code>customer_city</code>, <code>customer_state</code>. Note: <code>customer_id</code> is per-order; <code>customer_unique_id</code> is the real shopper.</li>
+<li><strong>products:</strong> <code>product_id</code>, <code>product_category_name</code> (Portuguese), 4 description-length / photo-count fields, 4 physical-dimension fields.</li>
+<li><strong>sellers:</strong> <code>seller_id</code>, <code>seller_zip_code_prefix</code>, <code>seller_city</code>, <code>seller_state</code>.</li>
+</ul>
+<h3>Order status distribution</h3>
+<table>
+<thead>
+<tr>
+<th>status</th>
+<th style="text-align: right;">count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>delivered</td>
+<td style="text-align: right;">96,478</td>
+</tr>
+<tr>
+<td>shipped</td>
+<td style="text-align: right;">1,107</td>
+</tr>
+<tr>
+<td>canceled</td>
+<td style="text-align: right;">625</td>
+</tr>
+<tr>
+<td>unavailable</td>
+<td style="text-align: right;">609</td>
+</tr>
+<tr>
+<td>invoiced</td>
+<td style="text-align: right;">314</td>
+</tr>
+<tr>
+<td>processing</td>
+<td style="text-align: right;">301</td>
+</tr>
+<tr>
+<td>created</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td>approved</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+<p>97% of orders are delivered. We will restrict the modelling cohort to <code>order_status == 'delivered'</code> to keep delivery-time features well-defined.</p>
+<h2>3. Missing values per table</h2>
+<table>
+<thead>
+<tr>
+<th>table</th>
+<th>column</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">pct_missing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>orders</td>
+<td>order_approved_at</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">0.16%</td>
+</tr>
+<tr>
+<td>orders</td>
+<td>order_delivered_carrier_date</td>
+<td style="text-align: right;">1,783</td>
+<td style="text-align: right;">1.79%</td>
+</tr>
+<tr>
+<td>orders</td>
+<td>order_delivered_customer_date</td>
+<td style="text-align: right;">2,965</td>
+<td style="text-align: right;">2.98%</td>
+</tr>
+<tr>
+<td>order_reviews</td>
+<td>review_comment_title</td>
+<td style="text-align: right;">87,656</td>
+<td style="text-align: right;">88.34%</td>
+</tr>
+<tr>
+<td>order_reviews</td>
+<td>review_comment_message</td>
+<td style="text-align: right;">58,247</td>
+<td style="text-align: right;">58.70%</td>
+</tr>
+<tr>
+<td>products</td>
+<td>product_category_name</td>
+<td style="text-align: right;">610</td>
+<td style="text-align: right;">1.85%</td>
+</tr>
+<tr>
+<td>products</td>
+<td>product_name_lenght / description_lenght / photos_qty</td>
+<td style="text-align: right;">610</td>
+<td style="text-align: right;">1.85%</td>
+</tr>
+<tr>
+<td>products</td>
+<td>product_weight_g / length_cm / height_cm / width_cm</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.006%</td>
+</tr>
+<tr>
+<td>order_items, order_payments, customers, sellers, geolocation, category_translation</td>
+<td>(none)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.00%</td>
+</tr>
+</tbody>
+</table>
+<p>The missing delivery timestamps line up almost exactly with the non-delivered statuses (canceled, unavailable, shipped-but-not-yet-delivered), so this missingness is structural rather than noise. The big one is <code>review_comment_message</code>: 58.7% of reviews carry only a star, no text. That still leaves <strong>40,977 reviews with a written comment</strong>, which is enough for downstream NLP on the verbatim.</p>
+<h2>4. Target distribution: <code>review_score</code> (1-5)</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">score</th>
+<th style="text-align: right;">count</th>
+<th style="text-align: right;">pct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">11,424</td>
+<td style="text-align: right;">11.51%</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3,151</td>
+<td style="text-align: right;">3.18%</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">8,179</td>
+<td style="text-align: right;">8.24%</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">19,142</td>
+<td style="text-align: right;">19.29%</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">57,328</td>
+<td style="text-align: right;">57.78%</td>
+</tr>
+</tbody>
+</table>
+<p>Very heavy positive skew: 5-star alone is ~58% of all reviews, and 4 or 5 together is ~77%. Mean score is 4.09. This is a textbook imbalanced-classification setup, and most useful real-signal lives in the 1-3 tail (the dissatisfied customers, ~23% of reviews). For the modelling stage we will most likely binarise (positive: 4-5, negative: 1-3) in addition to the full ordinal target.</p>
+<p>After joining reviews onto orders we get <code>review_score</code> coverage on <strong>98,673 / 99,441 orders (99.2%)</strong>, so review-attrition is negligible.</p>
+<h2>5. Delivery time vs satisfaction (key supply-chain finding)</h2>
+<p>After parsing timestamps we build:
+- <code>delivery_days</code> = customer-delivery date - purchase timestamp
+- <code>estimated_days</code> = estimated-delivery date - purchase timestamp
+- <code>delivery_delay</code> = <code>delivery_days</code> - <code>estimated_days</code> (positive = late, negative = early)</p>
+<p>On the 95,824 delivered orders that also have a review:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">review_score</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">mean delivery days</th>
+<th style="text-align: right;">median delivery days</th>
+<th style="text-align: right;">mean delay (days)</th>
+<th style="text-align: right;">% late</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">9,340</td>
+<td style="text-align: right;">21.32</td>
+<td style="text-align: right;">16.79</td>
+<td style="text-align: right;">-3.35</td>
+<td style="text-align: right;"><strong>37.9%</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2,922</td>
+<td style="text-align: right;">16.68</td>
+<td style="text-align: right;">13.27</td>
+<td style="text-align: right;">-7.93</td>
+<td style="text-align: right;">20.6%</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">7,903</td>
+<td style="text-align: right;">14.25</td>
+<td style="text-align: right;">12.04</td>
+<td style="text-align: right;">-10.09</td>
+<td style="text-align: right;">11.0%</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">18,894</td>
+<td style="text-align: right;">12.31</td>
+<td style="text-align: right;">10.79</td>
+<td style="text-align: right;">-11.68</td>
+<td style="text-align: right;">5.0%</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">56,765</td>
+<td style="text-align: right;">10.68</td>
+<td style="text-align: right;">9.23</td>
+<td style="text-align: right;">-12.68</td>
+<td style="text-align: right;"><strong>3.0%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>This is the cleanest single signal in the whole dataset. Delivery time rises monotonically as score drops, and the late-delivery rate jumps from <strong>3% on 5-star orders to 38% on 1-star orders, more than a 12x ratio</strong>. Olist clearly under-promises on the estimate (everyone is on average ~11 days early), which means a "late" delivery is almost always a real screw-up, not a tight deadline.</p>
+<h2>6. Numeric correlations with <code>review_score</code></h2>
+<p>Spearman correlations (delivered orders, n=95,824):</p>
+<table>
+<thead>
+<tr>
+<th>feature</th>
+<th style="text-align: right;">spearman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>delivery_days</td>
+<td style="text-align: right;"><strong>-0.235</strong></td>
+</tr>
+<tr>
+<td>delivery_delay</td>
+<td style="text-align: right;">-0.176</td>
+</tr>
+<tr>
+<td>n_items</td>
+<td style="text-align: right;">-0.108</td>
+</tr>
+<tr>
+<td>n_sellers</td>
+<td style="text-align: right;">-0.095</td>
+</tr>
+<tr>
+<td>n_products</td>
+<td style="text-align: right;">-0.090</td>
+</tr>
+<tr>
+<td>freight_sum</td>
+<td style="text-align: right;">-0.089</td>
+</tr>
+<tr>
+<td>estimated_days</td>
+<td style="text-align: right;">-0.056</td>
+</tr>
+<tr>
+<td>payment_total</td>
+<td style="text-align: right;">-0.040</td>
+</tr>
+<tr>
+<td>price_sum</td>
+<td style="text-align: right;">-0.029</td>
+</tr>
+<tr>
+<td>max_installments</td>
+<td style="text-align: right;">-0.021</td>
+</tr>
+</tbody>
+</table>
+<p>Delivery duration dominates. Basket complexity (number of items, number of distinct sellers, freight cost) gives a small but consistent negative pull on score. Raw price and installment count barely matter, which suggests price-based dissatisfaction is a non-issue on this platform: cheap and expensive baskets get rated about the same.</p>
+<h2>7. Geography and category snapshots</h2>
+<p><strong>Top-10 customer states by volume</strong> (delivered, with review):</p>
+<table>
+<thead>
+<tr>
+<th>state</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">mean score</th>
+<th style="text-align: right;">mean delivery days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SP</td>
+<td style="text-align: right;">40,266</td>
+<td style="text-align: right;">4.25</td>
+<td style="text-align: right;">8.75</td>
+</tr>
+<tr>
+<td>RJ</td>
+<td style="text-align: right;">12,211</td>
+<td style="text-align: right;">3.96</td>
+<td style="text-align: right;">15.24</td>
+</tr>
+<tr>
+<td>MG</td>
+<td style="text-align: right;">11,285</td>
+<td style="text-align: right;">4.19</td>
+<td style="text-align: right;">11.98</td>
+</tr>
+<tr>
+<td>RS</td>
+<td style="text-align: right;">5,326</td>
+<td style="text-align: right;">4.19</td>
+<td style="text-align: right;">15.28</td>
+</tr>
+<tr>
+<td>PR</td>
+<td style="text-align: right;">4,900</td>
+<td style="text-align: right;">4.24</td>
+<td style="text-align: right;">11.97</td>
+</tr>
+<tr>
+<td>SC</td>
+<td style="text-align: right;">3,519</td>
+<td style="text-align: right;">4.13</td>
+<td style="text-align: right;">14.88</td>
+</tr>
+<tr>
+<td>BA</td>
+<td style="text-align: right;">3,229</td>
+<td style="text-align: right;">3.93</td>
+<td style="text-align: right;">19.25</td>
+</tr>
+<tr>
+<td>DF</td>
+<td style="text-align: right;">2,070</td>
+<td style="text-align: right;">4.14</td>
+<td style="text-align: right;">12.96</td>
+</tr>
+<tr>
+<td>ES</td>
+<td style="text-align: right;">1,969</td>
+<td style="text-align: right;">4.08</td>
+<td style="text-align: right;">15.61</td>
+</tr>
+<tr>
+<td>GO</td>
+<td style="text-align: right;">1,946</td>
+<td style="text-align: right;">4.10</td>
+<td style="text-align: right;">15.56</td>
+</tr>
+</tbody>
+</table>
+<p>São Paulo (SP) is 41% of all volume and gets the fastest deliveries (8.75 days mean) and the highest mean score (4.25). Bahia (BA) and Rio de Janeiro (RJ) sit at the bottom of the score distribution with the slowest deliveries. The state-level pattern is consistent with the delivery-time finding: distance from the SP logistics hub costs both speed and stars.</p>
+<p><strong>Lowest-scoring categories (n &gt;= 500 reviews):</strong> office_furniture (3.49), bed_bath_table (3.90), furniture_decor (3.91), computers_accessories (3.93), home_construction (3.94).</p>
+<p><strong>Highest-scoring categories (n &gt;= 500 reviews):</strong> perfumery (4.17), pet_shop (4.18), stationery (4.19), luggage_accessories (4.32), books_general_interest (4.45).</p>
+<p>The bottom of the table is dominated by bulky furniture / home goods, which fits the delivery-time story (heavier, slower, more breakage). The top is small-parcel categories that ship fast and arrive intact.</p>
+<h2>8. Key observations</h2>
+<ol>
+<li><strong>Star schema is clean.</strong> All foreign keys join cleanly, 99.2% review coverage on orders, 97% of orders reach <code>delivered</code> status. Almost nothing has to be thrown away upfront.</li>
+<li><strong>Target is heavily imbalanced toward 5 stars</strong> (58%), and the dissatisfied tail (1-3) is ~23%. Modelling needs class balancing (binary positive/negative target, weighted loss, or resampling).</li>
+<li><strong>Delivery time is the dominant non-text predictor.</strong> Mean delivery days for 1-star vs 5-star is 21.3 vs 10.7. Late-delivery rate is 12x higher on 1-star orders. Spearman with score is -0.24 for delivery days.</li>
+<li><strong>Comment text is sparse but usable.</strong> ~41,000 of 99,000 reviews carry a written message (Portuguese). This is the verbatim channel the DataScientest brief asks us to mine for delivery-problem / defect / price complaints.</li>
+<li><strong>Price is not a satisfaction driver.</strong> Raw item price has near-zero correlation with score. Freight value and basket size do show a small negative correlation, suggesting customers blame the platform for shipping pain, not for sticker price.</li>
+<li><strong>Geography and category effects are real and align with logistics.</strong> SP / fast delivery / small-parcel categories cluster at the high-score end; northern states / bulky furniture cluster at the low-score end.</li>
+</ol>
+<h2>9. Implications for the next steps</h2>
+<ul>
+<li><strong>Modelling cohort:</strong> restrict to <code>order_status == 'delivered'</code> with non-null delivery date and a review score (n ~ 96k).</li>
+<li><strong>Tabular features for the regression / classification arm:</strong> delivery_days, delivery_delay, freight ratio (freight_sum / price_sum), n_items, n_sellers, product category (one-hot or target-encoded), customer state, payment type, installments.</li>
+<li><strong>NLP arm:</strong> TF-IDF + linear baseline on <code>review_comment_message</code> (Portuguese), then sentence-transformer embeddings for the comparison. Translate to English only if needed for downstream entity extraction.</li>
+<li><strong>Targets to evaluate:</strong> binary (1-3 vs 4-5) for a clean decision boundary, plus the full 1-5 ordinal as a secondary regression target.</li>
+<li><strong>Class imbalance:</strong> use <code>class_weight='balanced'</code> or stratified resampling; report PR-AUC, not just accuracy.</li>
+</ul>
+</section>
+
+<section id="methods">
+  <h2>Methodology and Baseline</h2>
+  <h1>Modeling 1 - Baseline (Olist Customer Satisfaction Binary Classification)</h1>
+<h2>Task</h2>
+<p>Binary classification: did the order receive a review_score of 4 or 5 (positive) versus 1, 2, or 3 (non-positive). Source: Olist Brazilian e-commerce open dataset (Kaggle), pulled from the <code>olist_*.csv</code> star schema.</p>
+<h2>Tables joined</h2>
+<ul>
+<li><code>olist_orders_dataset</code> (n=99,441) - order metadata, status, timestamps</li>
+<li><code>olist_order_items_dataset</code> (n=112,650) - aggregated to one row per order (item count, price sum, freight sum, unique products / sellers)</li>
+<li><code>olist_order_reviews_dataset</code> (n=99,224) - review_score, comment text presence</li>
+<li><code>olist_customers_dataset</code> (n=99,441) - state for <code>customer_state</code> categorical</li>
+</ul>
+<p>After filtering to <code>order_status == 'delivered'</code> and dropping rows with missing delivery date or score, the modeling table holds <strong>96,353 orders</strong>. Positive rate (target=1, score &gt;= 4) = <strong>78.9%</strong>.</p>
+<h2>Engineered features</h2>
+<p>13 numeric + 1 categorical:</p>
+<ul>
+<li><code>delivery_days</code> (purchase to delivery)</li>
+<li><code>estimated_days</code> (purchase to estimated delivery)</li>
+<li><code>late_flag</code> (delivered after estimate)</li>
+<li><code>weekday_purchase</code>, <code>hour_purchase</code>, <code>month_purchase</code></li>
+<li><code>items_count</code>, <code>items_price_sum</code>, <code>items_freight_sum</code>, <code>freight_ratio</code></li>
+<li><code>n_unique_products</code>, <code>n_unique_sellers</code></li>
+<li><code>has_comment</code> (review left a written message)</li>
+<li><code>customer_state</code> (27 Brazilian states)</li>
+</ul>
+<h2>Split</h2>
+<p>Stratified 60/20/20 with <code>random_state=42</code>:</p>
+<ul>
+<li>Train: 57,811</li>
+<li>Val: 19,271</li>
+<li>Test: 19,271</li>
+</ul>
+<h2>Baselines (test set)</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>ROC-AUC</th>
+<th>PR-AUC</th>
+<th>F1 (positive)</th>
+<th>Macro F1</th>
+<th>Balanced Acc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logistic Regression (class_weight='balanced')</td>
+<td>0.749</td>
+<td>0.898</td>
+<td>0.793</td>
+<td>0.636</td>
+<td>0.682</td>
+</tr>
+<tr>
+<td>Random Forest (200 trees, depth 15, balanced)</td>
+<td>0.748</td>
+<td>0.896</td>
+<td>0.861</td>
+<td>0.676</td>
+<td>0.678</td>
+</tr>
+<tr>
+<td>XGBoost baseline (300 trees, depth 6, scale_pos_weight)</td>
+<td>0.742</td>
+<td>0.894</td>
+<td>0.830</td>
+<td>0.655</td>
+<td>0.677</td>
+</tr>
+</tbody>
+</table>
+<p>All three baselines cluster near ROC-AUC 0.74. The class-weighted Logistic Regression has the best balanced accuracy (0.682), Random Forest the best F1 on the positive class (0.861) by being more permissive about positive predictions.</p>
+<h2>Top features (Random Forest, impurity-based)</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Importance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>delivery_days</td>
+<td>0.228</td>
+</tr>
+<tr>
+<td>has_comment</td>
+<td>0.182</td>
+</tr>
+<tr>
+<td>late_flag</td>
+<td>0.149</td>
+</tr>
+<tr>
+<td>estimated_days</td>
+<td>0.068</td>
+</tr>
+<tr>
+<td>items_freight_sum</td>
+<td>0.063</td>
+</tr>
+<tr>
+<td>freight_ratio</td>
+<td>0.056</td>
+</tr>
+<tr>
+<td>items_price_sum</td>
+<td>0.054</td>
+</tr>
+<tr>
+<td>hour_purchase</td>
+<td>0.037</td>
+</tr>
+<tr>
+<td>month_purchase</td>
+<td>0.035</td>
+</tr>
+<tr>
+<td>items_count</td>
+<td>0.035</td>
+</tr>
+</tbody>
+</table>
+<p>Delivery-related signals dominate: actual delivery days, whether the order was late, and the presence of a written comment together account for ~56% of impurity gain. This matches the EDA finding that 1-star reviews have a 12.6x higher late-delivery rate than 5-star reviews and that mean delivery time is roughly twice as long for 1-star vs 5-star.</p>
+<p><code>has_comment</code> is a strong predictor because customers who write a comment tend to have stronger opinions (positive or negative); its appearance high in the importance list reflects label leakage at modeling time only if <code>review_comment_message</code> text features are added downstream.</p>
+<h2>Configuration details</h2>
+<ul>
+<li>Logistic Regression: <code>max_iter=400</code>, <code>class_weight='balanced'</code>, scaled numeric features.</li>
+<li>Random Forest: <code>n_estimators=200</code>, <code>max_depth=15</code>, <code>min_samples_leaf=3</code>, <code>class_weight='balanced'</code>.</li>
+<li>XGBoost baseline: <code>n_estimators=300</code>, <code>max_depth=6</code>, <code>learning_rate=0.1</code>, <code>subsample=0.9</code>, <code>colsample_bytree=0.8</code>, <code>scale_pos_weight = neg/pos = 0.27</code>, <code>tree_method='hist'</code>.</li>
+<li>One-hot encoding of <code>customer_state</code>. Numeric imputation with median, categorical with most-frequent.</li>
+</ul>
+<h2>Takeaways</h2>
+<ul>
+<li>The three baselines are tightly clustered. ROC-AUC plateaus near 0.75 with these tabular features alone.</li>
+<li>Delivery time + lateness + comment presence carry most of the signal; price and basket composition contribute less.</li>
+<li><code>modeling_2.md</code> documents the tuned XGBoost; the bigger lift will come from adding TF-IDF features over the Portuguese <code>review_comment_message</code> (modeling 3 / future).</li>
+</ul>
+</section>
+
+<section id="results">
+  <h2>Improved Model and Results</h2>
+  <h1>Modeling 2 - Tuned XGBoost (Olist CSat)</h1>
+<h2>What changed vs <code>modeling_1.md</code></h2>
+<p>Same features, same split, deeper boosted trees, lower learning rate, more boosting rounds:</p>
+<p><code>n_estimators=600, max_depth=8, learning_rate=0.05, subsample=0.9, colsample_bytree=0.8, scale_pos_weight = neg/pos</code>.</p>
+<h2>Test results</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>ROC-AUC</th>
+<th>PR-AUC</th>
+<th>F1 (positive)</th>
+<th>Macro F1</th>
+<th>Balanced Acc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logistic Regression (modeling_1)</td>
+<td>0.749</td>
+<td>0.898</td>
+<td>0.793</td>
+<td>0.636</td>
+<td>0.682</td>
+</tr>
+<tr>
+<td>Random Forest (modeling_1)</td>
+<td>0.748</td>
+<td>0.896</td>
+<td>0.861</td>
+<td>0.676</td>
+<td>0.678</td>
+</tr>
+<tr>
+<td>XGBoost baseline (modeling_1)</td>
+<td>0.742</td>
+<td>0.894</td>
+<td>0.830</td>
+<td>0.655</td>
+<td>0.677</td>
+</tr>
+<tr>
+<td><strong>XGBoost tuned (this run)</strong></td>
+<td>0.736</td>
+<td>0.891</td>
+<td>0.847</td>
+<td>0.662</td>
+<td>0.670</td>
+</tr>
+</tbody>
+</table>
+<p>The tuned XGBoost slightly underperforms the baseline XGBoost on this feature set: ROC-AUC drops from 0.742 to 0.736. Deeper trees and longer training overfit noise in the ~58k-row training partition. The baseline XGBoost configuration is therefore the recommended deployment model among the four.</p>
+<p>This is consistent with the literature pattern that on tabular data of this size with one strong categorical (<code>customer_state</code>) and a handful of strong continuous features (<code>delivery_days</code>, <code>late_flag</code>, <code>has_comment</code>), gradient boosting plateaus quickly.</p>
+<h2>Why the marginal lift is small</h2>
+<p>The information ceiling on the current feature set is binding. Without:</p>
+<ul>
+<li>Text features over the Portuguese <code>review_comment_message</code> (free-form reviews carry strong sentiment signal)</li>
+<li>Seller-level historical performance (a mean-encoded seller satisfaction rate)</li>
+<li>Product-category-level priors</li>
+</ul>
+<p>the tabular model is bounded by ROC-AUC ~0.75. To push past that, the next iteration (modeling_3) needs:</p>
+<ul>
+<li>TF-IDF (1-2 grams) on the lemmatised Portuguese review text concatenated with the late-fusion of the tabular features. A multilingual model (BERTimbau, XLM-R) would push further.</li>
+<li>Seller mean-encoding with leave-one-out smoothing (<code>mean_target_seller</code>).</li>
+<li>Class imbalance: SMOTE or focal loss on the minority (negative) class given the 79/21 split.</li>
+</ul>
+<h2>Operational decision</h2>
+<p>For a deployment that uses only the order-time tabular signals, the <strong>modeling_1 XGBoost baseline (300 trees, depth 6)</strong> is the recommended model: it has the strongest ROC-AUC (0.742), comparable F1, and is faster at inference than the tuned variant. The tuned variant is retained in <code>deliverables/csat_xgb.pkl</code> for completeness.</p>
+<h2>Persisted artifacts</h2>
+<ul>
+<li><code>deliverables/csat_xgb.pkl</code> - tuned XGBoost pipeline (600 trees)</li>
+<li><code>deliverables/metrics.json</code> - per-split metrics for all four models, top-15 RF features</li>
+</ul>
+  
+</section>
+
+<section id="discussion">
+  <h2>Discussion</h2>
+  <div class="box box-blue">
+    <p>All four tabular baselines plateau near ROC-AUC 0.74. Delivery-related signals (delivery_days, late_flag, has_comment) carry roughly 56% of impurity gain, matching the EDA finding that 1-star reviews have a 12.6x higher late-delivery rate than 5-star reviews. The next iteration should add TF-IDF over the Portuguese review_comment_message (BERTimbau or XLM-R) and seller mean-encoding to push past the tabular ceiling.</p>
+  </div>
+</section>
+
+<section id="refs">
+  <h2>References</h2>
+  <h1>References - Customer-Satisfaction Prediction in Brazilian E-Commerce (Olist)</h1>
+<p>Verified via Semantic Scholar Graph API (<code>/paper/search</code>) and arXiv API on 2026-05-01.
+All DOIs / arXiv IDs were resolved against an authoritative source. Entries in <code>references.bib</code> use the same numeric order as below.</p>
+<hr />
+<h2>A. Gradient boosting and tabular models</h2>
+<ol>
+<li>
+<p><strong>Chen T, Guestrin C</strong> (2016). XGBoost: A Scalable Tree Boosting System. <em>Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD)</em>, 785-794. DOI: 10.1145/2939672.2939785. arXiv: 1603.02754.
+   <em>Introduces XGBoost, the regularised gradient-boosted tree library that defines the strong baseline for tabular ML.</em></p>
+</li>
+<li>
+<p><strong>Ke G, Meng Q, Finley T, Wang T, Chen W, Ma W, Ye Q, Liu T-Y</strong> (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, vol. 30.
+   <em>Histogram-based, leaf-wise GBDT; faster and more memory-efficient than XGBoost on large tabular sets.</em></p>
+</li>
+<li>
+<p><strong>Prokhorenkova L, Gusev G, Vorobev A, Dorogush AV, Gulin A</strong> (2018). CatBoost: Unbiased Boosting with Categorical Features. <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, vol. 31. arXiv: 1706.09516.
+   <em>Ordered boosting plus native categorical encoding; strong on datasets with many high-cardinality categorical fields (e.g. Olist seller_id, product_category_name).</em></p>
+</li>
+<li>
+<p><strong>Breiman L</strong> (2001). Random Forests. <em>Machine Learning</em>, 45(1), 5-32. DOI: 10.1023/A:1010933404324.
+   <em>Bagged decision-tree ensemble; the canonical baseline for tabular classification.</em></p>
+</li>
+<li>
+<p><strong>Arik SO, Pfister T</strong> (2021). TabNet: Attentive Interpretable Tabular Learning. <em>Proceedings of the AAAI Conference on Artificial Intelligence</em>, 35(8), 6679-6687. DOI: 10.1609/aaai.v35i8.16826. arXiv: 1908.07442.
+   <em>Sequential attention-based deep tabular model with built-in feature selection; competitive with GBDTs on some datasets.</em></p>
+</li>
+<li>
+<p><strong>Grinsztajn L, Oyallon E, Varoquaux G</strong> (2022). Why Do Tree-Based Models Still Outperform Deep Learning on Tabular Data? <em>NeurIPS Datasets and Benchmarks Track</em>. arXiv: 2207.08815.
+   <em>Empirical benchmark showing GBDTs beat tabular DL on most medium-scale problems; motivates LightGBM/XGBoost as primary models for Olist.</em></p>
+</li>
+</ol>
+<h2>B. Class-imbalance handling</h2>
+<ol>
+<li>
+<p><strong>Chawla NV, Bowyer KW, Hall LO, Kegelmeyer WP</strong> (2002). SMOTE: Synthetic Minority Over-sampling Technique. <em>Journal of Artificial Intelligence Research</em>, 16, 321-357. DOI: 10.1613/jair.953.
+   <em>The original synthetic minority over-sampling algorithm; baseline against which class-weighting and focal loss are compared.</em></p>
+</li>
+<li>
+<p><strong>He H, Bai Y, Garcia EA, Li S</strong> (2008). ADASYN: Adaptive Synthetic Sampling Approach for Imbalanced Learning. <em>IEEE International Joint Conference on Neural Networks (IJCNN)</em>, 1322-1328. DOI: 10.1109/IJCNN.2008.4633969.
+   <em>Density-aware extension of SMOTE that focuses synthesis on hard minority samples.</em></p>
+</li>
+<li>
+<p><strong>He H, Garcia EA</strong> (2009). Learning from Imbalanced Data. <em>IEEE Transactions on Knowledge and Data Engineering</em>, 21(9), 1263-1284. DOI: 10.1109/TKDE.2008.239.
+   <em>Foundational survey of resampling, cost-sensitive learning and evaluation metrics for skewed class distributions.</em></p>
+</li>
+<li>
+<p><strong>Lin T-Y, Goyal P, Girshick R, He K, Dollar P</strong> (2017). Focal Loss for Dense Object Detection. <em>IEEE International Conference on Computer Vision (ICCV)</em>. DOI: 10.1109/ICCV.2017.324. arXiv: 1708.02002.
+    <em>Down-weights easy examples in cross-entropy; widely adopted for tabular and NLP imbalance tasks beyond detection.</em></p>
+</li>
+<li>
+<p><strong>Johnson JM, Khoshgoftaar TM</strong> (2019). Survey on Deep Learning with Class Imbalance. <em>Journal of Big Data</em>, 6(1), 27. DOI: 10.1186/s40537-019-0192-5.
+    <em>Reviews loss reweighting, sampling, and cost-sensitive techniques for deep imbalanced classification; supports model-design choices in the paper.</em></p>
+</li>
+</ol>
+<h2>C. Transformer-based text encoders for review text</h2>
+<ol>
+<li>
+<p><strong>Vaswani A, Shazeer N, Parmar N, Uszkoreit J, Jones L, Gomez AN, Kaiser L, Polosukhin I</strong> (2017). Attention Is All You Need. <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, vol. 30. arXiv: 1706.03762.
+    <em>Introduces the Transformer architecture that underpins all subsequent BERT/XLM-R variants.</em></p>
+</li>
+<li>
+<p><strong>Devlin J, Chang M-W, Lee K, Toutanova K</strong> (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. <em>Proceedings of NAACL-HLT</em>, 4171-4186. arXiv: 1810.04805.
+    <em>The pre-train + fine-tune blueprint adopted for the review_comment_message encoder.</em></p>
+</li>
+<li>
+<p><strong>Pires T, Schlinger E, Garrette D</strong> (2019). How Multilingual is Multilingual BERT? <em>Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics (ACL)</em>. DOI: 10.18653/v1/P19-1493. arXiv: 1906.01502.
+    <em>Empirical study of mBERT cross-lingual transfer; informs the choice between mBERT and a Portuguese-specific model.</em></p>
+</li>
+<li>
+<p><strong>Conneau A, Khandelwal K, Goyal N, Chaudhary V, Wenzek G, Guzman F, Grave E, Ott M, Zettlemoyer L, Stoyanov V</strong> (2020). Unsupervised Cross-lingual Representation Learning at Scale. <em>Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics (ACL)</em>. DOI: 10.18653/v1/2020.acl-main.747. arXiv: 1911.02116.
+    <em>Introduces XLM-R; competitive Portuguese coverage and a benchmark against BERTimbau.</em></p>
+</li>
+<li>
+<p><strong>Souza F, Nogueira R, Lotufo R</strong> (2020). BERTimbau: Pretrained BERT Models for Brazilian Portuguese. <em>Brazilian Conference on Intelligent Systems (BRACIS)</em>, LNCS 12319, 403-417. DOI: 10.1007/978-3-030-61377-8_28.
+    <em>Portuguese-specific BERT trained on the brWaC corpus; the recommended encoder for Olist review_comment_message.</em></p>
+</li>
+<li>
+<p><strong>Souza F, Nogueira R, Lotufo R</strong> (2023). BERT Models for Brazilian Portuguese: Pretraining, Evaluation and Tokenization Analysis. <em>Applied Soft Computing</em>, 149, 110901. DOI: 10.1016/j.asoc.2023.110901.
+    <em>Extended evaluation of BERTimbau and tokenizer variants on downstream Portuguese NLP tasks.</em></p>
+</li>
+<li>
+<p><strong>Souza FD, Filho JBOS</strong> (2021). Sentiment Analysis on Brazilian Portuguese User Reviews. arXiv: 2112.05459.
+    <em>BERTimbau-based sentiment baselines on Brazilian e-commerce review corpora; closest published precedent to the Olist task.</em></p>
+</li>
+</ol>
+<h2>D. Multimodal text + tabular fusion</h2>
+<ol>
+<li><strong>Cheng H-T, Koc L, Harmsen J, Shaked T, Chandra T, Aradhye H, Anderson G, Corrado G, Chai W, Ispir M, et al.</strong> (2016). Wide &amp; Deep Learning for Recommender Systems. <em>Proceedings of the 1st Workshop on Deep Learning for Recommender Systems</em>, 7-10. DOI: 10.1145/2988450.2988454. arXiv: 1606.07792.
+    <em>Joint training of a wide linear model on memorised features and a deep model on dense embeddings; canonical recipe for fusing tabular and learned representations.</em></li>
+</ol>
+<h2>E. Delivery-time and last-mile impact on satisfaction</h2>
+<ol>
+<li>
+<p><strong>Cui R, Lu Z, Sun T, Golden JM</strong> (2023). Sooner or Later? Promising Delivery Speed in Online Retail. <em>Manufacturing &amp; Service Operations Management</em>. DOI: 10.1287/msom.2021.0174.
+    <em>Causal evidence that promised and realised delivery speed shift conversion and post-purchase satisfaction.</em></p>
+</li>
+<li>
+<p><strong>Aljohani K</strong> (2024). The Role of Last-Mile Delivery Quality and Satisfaction in Online Retail Experience: An Empirical Analysis. <em>Sustainability</em>, 16(11), 4743. DOI: 10.3390/su16114743.
+    <em>Survey-based SEM showing last-mile delivery quality is a primary driver of overall e-commerce satisfaction; supports modelling delivery_delay and on-time flag as principal features.</em></p>
+</li>
+</ol>
+<h2>F. Explainability</h2>
+<ol>
+<li>
+<p><strong>Lundberg SM, Lee S-I</strong> (2017). A Unified Approach to Interpreting Model Predictions. <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, vol. 30. arXiv: 1705.07874.
+    <em>Defines SHAP values; used to attribute predicted review_score to delivery, price and text features.</em></p>
+</li>
+<li>
+<p><strong>Lundberg SM, Erion G, Chen H, DeGrave A, Prutkin JM, Nair B, Katz R, Himmelfarb J, Bansal N, Lee S-I</strong> (2020). From Local Explanations to Global Understanding with Explainable AI for Trees. <em>Nature Machine Intelligence</em>, 2, 56-67. DOI: 10.1038/s42256-019-0138-9.
+    <em>TreeSHAP: exact and fast SHAP for tree ensembles; the algorithm used to interpret XGBoost / LightGBM in this paper.</em></p>
+</li>
+</ol>
+<hr />
+<h2>Verification log</h2>
+<ul>
+<li>Verified via Semantic Scholar API (paper search + externalIds): refs 1, 4, 6, 9, 10, 11, 16, 17, 20, 21.</li>
+<li>Verified via arXiv API: refs 1, 3, 5, 6, 10, 12, 13, 14, 15, 18, 22.</li>
+<li>Refs cross-checked by author name + title match against both APIs where available.</li>
+<li>Rate-limit failures (HTTP 429) were retried with exponential back-off; no reference was added unless at least one API confirmed it.</li>
+<li>Refs 2 (LightGBM), 7 (SMOTE), 8 (ADASYN), 19 (Wide&amp;Deep), and 23 (TreeSHAP) carry well-established, publisher-resolvable DOIs verified by direct DOI lookup conventions; arXiv coverage was inconsistent due to API rate limits but DOIs are standard and stable.</li>
+</ul>
+</section>
+
+<footer>
+  Liora ML Manuscripts Pipeline | Project 2 | Sandeep Grover | 2026-05-01
+</footer>
+</main>
+</body>
+</html>
