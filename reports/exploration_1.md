@@ -1,12 +1,12 @@
 # Exploration Report 1: Olist Supply Chain Customer Satisfaction
 
-**Project:** Liora #2 (Supply Chain - Customer Satisfaction)
+
 **Date:** 2026-05-01
 **Notebook:** `notebooks/01_eda.ipynb`
 
 ## 1. Project framing
 
-The DataScientest brief asks for a customer-satisfaction study built on review data, with the explicit modelling target being a star-rating regression / classification (1-5) plus optional NLP on the verbatim comment. The brief points to scraping Trustpilot or using Trusted Shops verified reviews. The dataset supplied for this Liora project is the public **Olist Brazilian e-commerce** corpus (2016-2018), which is a stronger fit for a supply-chain framing than scraped Trustpilot stars: every review is tied to a verified purchase with the full upstream trail (seller, items, shipment timestamps, freight cost, payment, delivery date), so we can actually measure the supply chain's effect on satisfaction rather than just the post-hoc opinion.
+The DataScientest brief asks for a customer-satisfaction study built on review data, with the explicit modelling target being a star-rating regression / classification (1-5) plus optional NLP on the verbatim comment. The brief points to scraping Trustpilot or using Trusted Shops verified reviews. The dataset supplied for this Portfolio project is the public **Olist Brazilian e-commerce** corpus (2016-2018), which is a stronger fit for a supply-chain framing than scraped Trustpilot stars: every review is tied to a verified purchase with the full upstream trail (seller, items, shipment timestamps, freight cost, payment, delivery date), so we can actually measure the supply chain's effect on satisfaction rather than just the post-hoc opinion.
 
 ## 2. Dataset description
 

@@ -19,7 +19,7 @@ def code(text):
 md("""
 # Olist CSAT Modeling: Baseline + Improved
 
-**Project:** Liora #2 (Supply Chain - Customer Satisfaction)
+
 
 **Goal:** Binary classification of customer satisfaction (review_score >= 4 vs <= 3)
 on the Olist Brazilian e-commerce dataset. Train four tabular baselines
@@ -69,7 +69,7 @@ warnings.filterwarnings('ignore')
 pd.set_option('display.max_columns', 80)
 pd.set_option('display.width', 160)
 
-PROJECT = '/root/AI/liora_projects/02_supply_chain_csat'
+PROJECT = '/root/AI/project_root'
 DATA_DIR = os.path.join(PROJECT, 'data')
 DELIVERABLES = os.path.join(PROJECT, 'deliverables')
 os.makedirs(DELIVERABLES, exist_ok=True)
@@ -682,7 +682,7 @@ nb.metadata = {
     'language_info': {'name': 'python'},
 }
 
-OUT = '/root/AI/liora_projects/02_supply_chain_csat/notebooks/03_modeling.ipynb'
+OUT = '/root/AI/project_root/notebooks/03_modeling.ipynb'
 with open(OUT, 'w') as f:
     nbf.write(nb, f)
 print('wrote', OUT, 'with', len(cells), 'cells')
