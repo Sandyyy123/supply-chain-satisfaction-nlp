@@ -68,7 +68,7 @@ pip install -r requirements.txt
 jupyter notebook notebooks/01_eda.ipynb
 # or run modeling:
 jupyter notebook notebooks/03_modeling.ipynb
-python src/model_advanced.py
+jupyter notebook notebooks/03_modeling.ipynb  # advanced model (GPU recommended)
 ```
 
 ---
