@@ -69,7 +69,7 @@ warnings.filterwarnings('ignore')
 pd.set_option('display.max_columns', 80)
 pd.set_option('display.width', 160)
 
-PROJECT = '/root/AI/project_root'
+PROJECT = '.'
 DATA_DIR = os.path.join(PROJECT, 'data')
 DELIVERABLES = os.path.join(PROJECT, 'deliverables')
 os.makedirs(DELIVERABLES, exist_ok=True)
@@ -682,7 +682,7 @@ nb.metadata = {
     'language_info': {'name': 'python'},
 }
 
-OUT = '/root/AI/project_root/notebooks/03_modeling.ipynb'
+OUT = './notebooks/03_modeling.ipynb'
 with open(OUT, 'w') as f:
     nbf.write(nb, f)
 print('wrote', OUT, 'with', len(cells), 'cells')
